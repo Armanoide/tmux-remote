@@ -9,10 +9,18 @@ if [[ -z "$saved" ]]; then
     tmux set -g "$saved_status_left_option" "$(tmux show-option -gv status-left)"
 fi
 
-# Read indicator options
-text="$(tmux show-option -gv "$indicator_text_option")"
-fg="$(tmux show-option -gv "$indicator_fg_option")"
-bg="$(tmux show-option -gv "$indicator_bg_option")"
+# Read indicator options: with @remote-one-bar "on" the parent's visible bar is the
+# LOCAL side of the pair (child shows REMOTE); with "off" = upstream badge text.
+one_bar="$(tmux show-options -gv "$one_bar_option" 2>/dev/null)"
+if [[ "$one_bar" == "on" ]]; then
+	text="$(tmux show-option -gv "$local_indicator_text_option")"
+	fg="$(tmux show-option -gv "$local_indicator_fg_option")"
+	bg="$(tmux show-option -gv "$local_indicator_bg_option")"
+else
+	text="$(tmux show-option -gv "$indicator_text_option")"
+	fg="$(tmux show-option -gv "$indicator_fg_option")"
+	bg="$(tmux show-option -gv "$indicator_bg_option")"
+fi
 
 # @remote-one-bar "on" → exactly one bar visible. The parent hides its own bar
 # below, so the nested child must SHOW its bar (inverse rule). The show key is

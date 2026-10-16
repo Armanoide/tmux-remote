@@ -24,6 +24,15 @@ main() {
 	if option_not_set "$indicator_bg_option"; then
 		tmux set-option -g "$indicator_bg_option" "$default_indicator_bg"
 	fi
+	if option_not_set "$local_indicator_text_option"; then
+		tmux set-option -g "$local_indicator_text_option" "$default_local_indicator_text"
+	fi
+	if option_not_set "$local_indicator_fg_option"; then
+		tmux set-option -g "$local_indicator_fg_option" "$default_local_indicator_fg"
+	fi
+	if option_not_set "$local_indicator_bg_option"; then
+		tmux set-option -g "$local_indicator_bg_option" "$default_local_indicator_bg"
+	fi
 	if option_not_set "$one_bar_option"; then
 		tmux set-option -g "$one_bar_option" "off"
 	fi
@@ -32,6 +41,15 @@ main() {
 	fi
 	if option_not_set "$child_show_key_option"; then
 		tmux set-option -g "$child_show_key_option" "$default_child_show_key"
+	fi
+	if option_not_set "$child_indicator_text_option"; then
+		tmux set-option -g "$child_indicator_text_option" "$default_child_indicator_text"
+	fi
+	if option_not_set "$child_indicator_fg_option"; then
+		tmux set-option -g "$child_indicator_fg_option" "$default_child_indicator_fg"
+	fi
+	if option_not_set "$child_indicator_bg_option"; then
+		tmux set-option -g "$child_indicator_bg_option" "$default_child_indicator_bg"
 	fi
 
 	local toggle_key; toggle_key=$(tmux show-option -gv "$toggle_key_option")
@@ -65,12 +83,17 @@ main() {
 	# @remote-one-bar "on" → install child-side bindings so the parent can
 	# hide/restore this server's bar via send-keys into the ssh pane. Default "off"
 	# = upstream behavior (badge only, no child bar control).
+	# When the child SHOWS its bar it also displays the child indicator (REMOTE);
+	# when it HIDES, the indicator is cleared with the bar.
 	local one_bar; one_bar="$(tmux show-option -gv "$one_bar_option")"
 	if [[ "$one_bar" == "on" ]]; then
 		local child_hide_key; child_hide_key=$(tmux show-option -gv "$child_hide_key_option")
 		local child_show_key; child_show_key=$(tmux show-option -gv "$child_show_key_option")
-		tmux bind-key -n "$child_hide_key" "set -g status off"
-		tmux bind-key -n "$child_show_key" "set -g status on"
+		local c_text; c_text="$(tmux show-option -gv "$child_indicator_text_option")"
+		local c_fg; c_fg="$(tmux show-option -gv "$child_indicator_fg_option")"
+		local c_bg; c_bg="$(tmux show-option -gv "$child_indicator_bg_option")"
+		tmux bind-key -n "$child_hide_key" "set -g status off; set -gu status-left"
+		tmux bind-key -n "$child_show_key" "set -g status on; set -g status-left '#[fg=$c_fg,bg=$c_bg]$c_text#[bg=default] '"
 	fi
 }
 
