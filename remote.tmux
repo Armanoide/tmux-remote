@@ -24,6 +24,15 @@ main() {
 	if option_not_set "$indicator_bg_option"; then
 		tmux set-option -g "$indicator_bg_option" "$default_indicator_bg"
 	fi
+	if option_not_set "$one_bar_option"; then
+		tmux set-option -g "$one_bar_option" "off"
+	fi
+	if option_not_set "$child_hide_key_option"; then
+		tmux set-option -g "$child_hide_key_option" "$default_child_hide_key"
+	fi
+	if option_not_set "$child_show_key_option"; then
+		tmux set-option -g "$child_show_key_option" "$default_child_show_key"
+	fi
 
 	local toggle_key; toggle_key=$(tmux show-option -gv "$toggle_key_option")
 	local on_key; on_key=$(tmux show-option -gv "$on_key_option")
@@ -52,6 +61,17 @@ main() {
 		run-shell "$CURRENT_DIR/scripts/toggle_off.sh"
 	tmux bind -T off "$off_key" \
 		run-shell "$CURRENT_DIR/scripts/toggle_off.sh"
+
+	# @remote-one-bar "on" → install child-side bindings so the parent can
+	# hide/restore this server's bar via send-keys into the ssh pane. Default "off"
+	# = upstream behavior (badge only, no child bar control).
+	local one_bar; one_bar="$(tmux show-option -gv "$one_bar_option")"
+	if [[ "$one_bar" == "on" ]]; then
+		local child_hide_key; child_hide_key=$(tmux show-option -gv "$child_hide_key_option")
+		local child_show_key; child_show_key=$(tmux show-option -gv "$child_show_key_option")
+		tmux bind-key -n "$child_hide_key" "set -g status off"
+		tmux bind-key -n "$child_show_key" "set -g status on"
+	fi
 }
 
 main
