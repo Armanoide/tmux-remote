@@ -14,6 +14,7 @@ text="$(tmux show-option -gv "$indicator_text_option")"
 fg="$(tmux show-option -gv "$indicator_fg_option")"
 bg="$(tmux show-option -gv "$indicator_bg_option")"
 
+tmux set -g status off
 tmux set prefix None
 tmux set key-table off
 tmux set -g status-left "#[fg=$fg,bg=$bg]$text#[bg=default] "
