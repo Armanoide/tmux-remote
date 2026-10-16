@@ -7,15 +7,15 @@ tmux set -g status on
 tmux set -u prefix
 tmux set -u key-table
 
-# @remote-one-bar "on" → restore the child's bar via the child-show key sent into
-# the ssh pane.
+# @remote-one-bar "on" → exactly one bar visible. The parent shows its own bar
+# below, so the nested child must HIDE its bar (inverse rule). The hide key is
+# sent into the focused pane as window.pane "W.P" — %pane_id does not traverse
+# nested ssh (verified real). Default "off" = upstream behavior (badge only).
 one_bar="$(tmux show-options -gv "$one_bar_option" 2>/dev/null)"
 if [[ "$one_bar" == "on" ]]; then
-    child_show_key="$(tmux show-options -gv "$child_show_key_option" 2>/dev/null)"
-    # Target format MUST be window.pane (e.g. "4.1"), NOT %pane_id: on nested ssh
-    # the key only traverses to the child with window.pane addressing (verified real).
-    remote_pane="$(tmux list-panes -a -F '#{window_index}.#{pane_index} #{pane_current_command}' | awk '$2=="ssh"{print $1; exit}')"
-    [[ -n "$remote_pane" ]] && tmux send-keys -t "$remote_pane" "$child_show_key"
+    child_hide_key="$(tmux show-options -gv "$child_hide_key_option" 2>/dev/null)"
+    remote_pane="$(tmux display-message -p '#{window_index}.#{pane_index}')"
+    [[ -n "$remote_pane" ]] && tmux send-keys -t "$remote_pane" "$child_hide_key"
 fi
 
 # Restore the original status-left saved by toggle_on, then clear the saved value so
