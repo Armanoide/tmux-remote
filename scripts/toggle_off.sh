@@ -26,13 +26,13 @@ if [[ -n "$saved" ]]; then
 fi
 tmux set -gu "$saved_status_left_option"
 
-# @remote-one-bar "on" → the parent's restored bar carries the LOCAL badge
-# (the child's bar is hidden above, showing REMOTE when it comes back).
+# @remote-one-bar "on" → the parent's restored bar carries the LOCAL badge in the
+# dedicated @remote-status slot — status-left itself stays owned by the theme.
 if [[ "$one_bar" == "on" ]]; then
     text="$(tmux show-option -gv "$local_indicator_text_option")"
     fg="$(tmux show-option -gv "$local_indicator_fg_option")"
     bg="$(tmux show-option -gv "$local_indicator_bg_option")"
-    tmux set -g status-left "#[fg=$fg,bg=$bg]$text#[bg=default] "
+    tmux set -g "$remote_status_option" "#[bg=default,fg=$bg] #[bg=$bg,fg=$fg]$text#[bg=default,fg=$bg] "
 fi
 
 tmux refresh-client -S

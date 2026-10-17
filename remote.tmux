@@ -51,6 +51,9 @@ main() {
 	if option_not_set "$child_indicator_bg_option"; then
 		tmux set-option -g "$child_indicator_bg_option" "$default_child_indicator_bg"
 	fi
+	if option_not_set "$remote_status_option"; then
+		tmux set-option -g "$remote_status_option" "$default_remote_status"
+	fi
 
 	local toggle_key; toggle_key=$(tmux show-option -gv "$toggle_key_option")
 	local on_key; on_key=$(tmux show-option -gv "$on_key_option")
@@ -92,8 +95,11 @@ main() {
 		local c_text; c_text="$(tmux show-option -gv "$child_indicator_text_option")"
 		local c_fg; c_fg="$(tmux show-option -gv "$child_indicator_fg_option")"
 		local c_bg; c_bg="$(tmux show-option -gv "$child_indicator_bg_option")"
-		tmux bind-key -n "$child_hide_key" "set -g status off; set -gu status-left"
-		tmux bind-key -n "$child_show_key" "set -g status on; set -g status-left '#[fg=$c_fg,bg=$c_bg]$c_text#[bg=default] '"
+		# Badges live in the dedicated @remote-status slot (declared by the user's
+		# .tmux.conf via status-left "#{E:@remote_status}") — status-left is never
+		# overwritten, so theme segments (catppuccin session, …) stay intact.
+		tmux bind-key -n "$child_hide_key" "set -g status off; set -g $remote_status_option ''"
+		tmux bind-key -n "$child_show_key" "set -g status on; set -g $remote_status_option '#[bg=default,fg=$c_bg] #[bg=$c_bg,fg=$c_fg]$c_text#[bg=default,fg=$c_bg] '"
 	fi
 }
 
