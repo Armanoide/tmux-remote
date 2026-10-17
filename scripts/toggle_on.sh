@@ -40,5 +40,15 @@ tmux set key-table off
 if [[ "$one_bar" == "on" ]]; then
 	tmux set -g "$remote_status_option" "#[bg=default,fg=$bg] #[bg=$bg,fg=$fg]$text#[bg=default,fg=$bg] "
 fi
+
+# Pane-border badge: the ssh pane's top border shows REMOTE while remote mode is
+# on, so the mode stays visible even when this server's bar is hidden. The border
+# color comes from @remote-pane-badge-fg (green = not prefix, red = prefix), so it
+# matches the current bar-badge color. toggle_off only removes our segment — a
+# user-configured pane-border-format is preserved (catppuccin sets one).
+badge_fg="$(tmux show-option -gv "$pane_badge_fg_option")"
+[[ "$(tmux show-options -gv client_prefix 2>/dev/null)" == "1" ]] && badge_fg="$bg"
+tmux set -ag pane-border-format " #[fg=$badge_fg,bold]REMOTE#[default] "
+
 tmux if -F '#{pane_in_mode}' 'send-keys -X cancel'
 tmux refresh-client -S

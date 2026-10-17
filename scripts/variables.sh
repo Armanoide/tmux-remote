@@ -15,6 +15,7 @@ local_indicator_bg_option="@remote-local-indicator-bg"
 child_indicator_text_option="@remote-child-indicator-text"
 child_indicator_fg_option="@remote-child-indicator-fg"
 child_indicator_bg_option="@remote-child-indicator-bg"
+pane_badge_fg_option="@remote-pane-badge-fg"
 remote_status_option="@remote-status"
 
 # default option values
@@ -32,4 +33,5 @@ default_local_indicator_bg="#a6e3a1"
 default_child_indicator_text=" REMOTE >>> "
 default_child_indicator_fg="#1e1e2e"
 default_child_indicator_bg="#f38ba8"
+default_pane_badge_fg="#a6e3a1"
 default_remote_status=""

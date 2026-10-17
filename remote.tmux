@@ -54,6 +54,9 @@ main() {
 	if option_not_set "$remote_status_option"; then
 		tmux set-option -g "$remote_status_option" "$default_remote_status"
 	fi
+	if option_not_set "$pane_badge_fg_option"; then
+		tmux set-option -g "$pane_badge_fg_option" "$default_pane_badge_fg"
+	fi
 
 	local toggle_key; toggle_key=$(tmux show-option -gv "$toggle_key_option")
 	local on_key; on_key=$(tmux show-option -gv "$on_key_option")

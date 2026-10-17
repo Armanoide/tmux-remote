@@ -35,4 +35,17 @@ if [[ "$one_bar" == "on" ]]; then
     tmux set -g "$remote_status_option" "#[bg=default,fg=$bg] #[bg=$bg,fg=$fg]$text#[bg=default,fg=$bg] "
 fi
 
+# Pane-border badge: remove only our REMOTE segment from pane borders (catppuccin's
+# own format is preserved). If nothing remains, undefine the option entirely.
+fmt="$(tmux show-options -gv pane-border-format 2>/dev/null)"
+if [[ "$fmt" == *"REMOTE"* ]]; then
+    stripped="$(printf '%s' "$fmt" | sed 's/ #\[fg=[^]]*\]#*REMOTE#\[default\] //')"
+    if [[ -n "$stripped" ]]; then
+        tmux set -g pane-border-format "$stripped"
+    else
+        tmux set -gu pane-border-format
+        tmux set -gu pane-border-status
+    fi
+fi
+
 tmux refresh-client -S
